@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json#",
+  "title": "GEODES Extension",
+  "description": "STAC GEODES Extension for STAC Items and STAC Collections: fields of the CNES GEODES catalog that no other STAC extension covers, and the GEODES keys of the common metadata Statistics Object.",
+  "type": "object",
+  "required": [
+    "stac_extensions",
+    "type"
+  ],
+  "properties": {
+    "stac_extensions": {
+      "type": "array",
+      "contains": {
+        "const": "https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json"
+      }
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Collection",
+        "Feature"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "$comment": "STAC Items: GEODES fields in the item properties.",
+      "type": "object",
+      "required": [
+        "type",
+        "properties"
+      ],
+      "properties": {
+        "type": {
+          "const": "Feature"
+        },
+        "properties": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/require_any_field"
+            },
+            {
+              "$ref": "#/definitions/fields"
+            },
+            {
+              "properties": {
+                "statistics": {
+                  "$ref": "#/definitions/statistics"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "$comment": "STAC Collections: summaries of geodes:visibility.",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "Collection"
+        },
+        "summaries": {
+          "$ref": "#/definitions/summaries"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "geodes:visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "private",
+        "expert"
+      ],
+      "description": "Item-level access tier asserted by the data provider. Consumed by GEODES access policies (schemas/policies/v1/) to gate read and download. 'public' items are accessible to anyone; 'private' items require an authenticated user with the right Keycloak group (typically the collection's group, e.g. 'co3d'); 'expert' items are reserved for expert-tier audiences (e.g. FLATSIM_*_VD_EXPERT). Providers are responsible for setting this field correctly at ingestion."
+    },
+    "require_any_field": {
+      "$comment": "An Item that declares this extension carries geodes:visibility or statistics.",
+      "anyOf": [
+        {
+          "required": [
+            "geodes:visibility"
+          ]
+        },
+        {
+          "required": [
+            "statistics"
+          ]
+        }
+      ]
+    },
+    "fields": {
+      "type": "object",
+      "properties": {
+        "geodes:visibility": {
+          "$ref": "#/definitions/geodes:visibility"
+        }
+      },
+      "patternProperties": {
+        "^(?!geodes:)": {
+          "$comment": "Do not allow other fields with this prefix"
+        }
+      },
+      "additionalProperties": false
+    },
+    "summaries": {
+      "type": "object",
+      "properties": {
+        "geodes:visibility": {
+          "type": [
+            "array",
+            "object"
+          ],
+          "items": {
+            "$ref": "#/definitions/geodes:visibility"
+          }
+        }
+      },
+      "patternProperties": {
+        "^(?!geodes:)": {
+          "$comment": "Do not allow other fields with this prefix"
+        }
+      },
+      "additionalProperties": false
+    },
+    "statistics": {
+      "type": "object",
+      "description": "GEODES keys of the STAC common metadata Statistics Object (Item properties 'statistics'). All values are percentages (0-100), except interpolated_columns (a count). Other keys of the Statistics Object stay allowed.",
+      "properties": {
+        "water": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of water pixels."
+        },
+        "nodata_pixel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of no-data pixels. Equal to 100 - valid_percent."
+        },
+        "saturated_defective_pixel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of saturated or defective pixels."
+        },
+        "ground_useful_pixel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of useful ground pixels (not cloud, not no-data)."
+        },
+        "min_useful_pixel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Minimum useful pixel percentage, as defined by the data provider."
+        },
+        "interpolated_columns": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of image columns restored by interpolation between neighbouring columns (dead detectors). A count, not a percentage."
+        }
+      }
+    }
+  }
+}
