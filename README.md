@@ -1,19 +1,22 @@
-# Template Extension Specification
+# GEODES Extension Specification
 
-- **Title:** Template
-- **Identifier:** <https://stac-extensions.github.io/template/v0.1.0/schema.json>
-- **Field Name Prefix:** template
-- **Scope:** Catalog, Collection, Item
+- **Title:** GEODES
+- **Identifier:** <https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json>
+- **Field Name Prefix:** geodes
+- **Scope:** Item, Collection
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
-- **Owner**: @your-gh-handles @person2
+- **Owner**: @emmanuelmathot
 
-This document explains the Template Extension to the [SpatioTemporal Asset Catalog](https://github.com/radiantearth/stac-spec) (STAC) specification.
+This document explains the GEODES Extension to the [SpatioTemporal Asset Catalog](https://github.com/radiantearth/stac-spec) (STAC) specification.
 
-This is the place to add a short introduction.
+[GEODES](https://geodes.cnes.fr/) is the Earth observation data catalog of CNES. This extension defines the few fields
+that the GEODES catalog needs and that no other STAC extension covers. It is a last resort: GEODES uses official
+STAC extensions first, and mission-specific metadata goes in a mission extension
+(for example the [SPOT Extension](https://github.com/CNES/spot-stac-extension)).
 
 - Examples:
-  - [Item example](examples/item.json): Shows the basic usage of the extension in a STAC Item
-  - [Collection example](examples/collection.json): Shows the basic usage of the extension in a STAC Collection
+  - [Item example](examples/item.json): A THEIA SPOT World Heritage Level-1C item with visibility and quality statistics
+  - [Collection example](examples/collection.json): Summary of the visibility in a STAC Collection
 - [JSON Schema](json-schema/schema.json)
 - [Changelog](./CHANGELOG.md)
 
@@ -21,43 +24,84 @@ This is the place to add a short introduction.
 
 The fields in the table below can be used in these parts of STAC documents:
 
-- [x] Catalogs
-- [x] Collections
+- [ ] Catalogs
+- [x] Collections (summaries only)
 - [x] Item Properties (incl. Summaries in Collections)
-- [x] Assets (for both Collections and Items, incl. Item Asset Definitions in Collections and Asset Templates)
-- [x] Links (incl. Link Templates)
-- [x] Bands
+- [ ] Assets (for both Collections and Items, incl. Item Asset Definitions in Collections and Asset Templates)
+- [ ] Links
+- [ ] Bands
 
-| Field Name           | Type                      | Description                                  |
-| -------------------- | ------------------------- | -------------------------------------------- |
-| template:new_field   | string                    | **REQUIRED**. Describe the required field... |
-| template:xyz         | [XYZ Object](#xyz-object) | Describe the field...                        |
-| template:another_one | \[number]                 | Describe the field...                        |
+| Field Name        | Type   | Description                                               |
+| ----------------- | ------ | --------------------------------------------------------- |
+| geodes:visibility | string | Access tier of the item: `public`, `private` or `expert`. |
+
+An Item that declares this extension must have `geodes:visibility` or `statistics`.
 
 ### Additional Field Information
 
-#### template:new_field
+#### geodes:visibility
 
-This is a much more detailed description of the field `template:new_field`...
+The data provider sets the access tier of each item. The GEODES access policies use it to allow or refuse the read and the download:
 
-### XYZ Object
+- `public`: anyone can access the item.
+- `private`: only authenticated users of the authorised groups (usually the group of the collection) can access the item.
+- `expert`: only the expert audience of the collection can access the item.
 
-This is the introduction for the purpose and the content of the XYZ Object...
+Example: `"geodes:visibility": "public"`.
 
-| Field Name | Type   | Description                                  |
-| ---------- | ------ | -------------------------------------------- |
-| x          | number | **REQUIRED**. Describe the required field... |
-| y          | number | **REQUIRED**. Describe the required field... |
-| z          | number | **REQUIRED**. Describe the required field... |
+## Statistics keys
 
-## Relation types
+GEODES does not define its own statistics field. The quality statistics of an Item go in the `statistics` field of the
+Item properties: the [Statistics Object](https://github.com/radiantearth/stac-spec/blob/v1.1.0/commons/common-metadata.md#statistics-object)
+of STAC common metadata. The STAC specification allows this object in the Item properties, and allows keys other than
+`minimum`, `maximum`, `mean`, `stddev`, `count` and `valid_percent`, for example coverage percentages.
+The [Sentinel-2 Extension](https://github.com/stac-extensions/sentinel-2) also moved its `*_percentage` fields to this object.
 
-The following types should be used as applicable `rel` types in the
-[Link Object](https://github.com/radiantearth/stac-spec/tree/master/item-spec/item-spec.md#link-object).
+This extension defines the GEODES keys of the Statistics Object and validates them when an Item declares the extension.
+All values are percentages of the pixels of the Item, from 0 to 100, except `interpolated_columns`, which is a count.
+All keys are optional, and other keys of the
+Statistics Object stay allowed.
 
-| Type           | Description                           |
-| -------------- | ------------------------------------- |
-| fancy-rel-type | This link points to a fancy resource. |
+| Key                         | Type    | Description                                                                                    |
+| --------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| water                       | number  | Percentage of water pixels.                                                                    |
+| nodata\_pixel               | number  | Percentage of no-data pixels (= 100 − `valid_percent`).                                        |
+| saturated\_defective\_pixel | number  | Percentage of saturated or defective pixels.                                                   |
+| ground\_useful\_pixel       | number  | Percentage of useful ground pixels (not cloud, not no-data).                                   |
+| min\_useful\_pixel          | number  | Minimum useful pixel percentage, as defined by the data provider.                              |
+| interpolated\_columns       | integer | Number of image columns restored by interpolation (dead detectors). A count, not a percentage. |
+
+The key names follow the rule of the Sentinel-2 Extension: remove the prefix and the `_percentage` suffix
+of the mission field name (`nodata_pixel_percentage` becomes `nodata_pixel`).
+
+Example:
+
+```json
+"statistics": {
+  "water": 0.0,
+  "nodata_pixel": 0.0,
+  "saturated_defective_pixel": 6.807989,
+  "ground_useful_pixel": 75.490373,
+  "min_useful_pixel": 10.410544,
+  "interpolated_columns": 0
+}
+```
+
+Each value has one stable property path, for example `statistics.nodata_pixel`, so a
+[CQL2](https://docs.ogc.org/is/21-065r2/21-065r2.html) filter can use it like any other number:
+
+```json
+{
+  "filter-lang": "cql2-json",
+  "filter": {
+    "op": "<",
+    "args": [{ "property": "statistics.nodata_pixel" }, 10]
+  }
+}
+```
+
+A Collection should also describe the keys that its Items use with a JSON Schema in `summaries.statistics`,
+as the STAC specification recommends.
 
 ## Contributing
 
