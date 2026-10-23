@@ -1,7 +1,7 @@
 {
   "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json"
+    "https://cnes.github.io/geodes-stac-extension/v0.5.0/schema.json"
   ],
   "type": "Feature",
   "id": "SPOT5-HRG2-XS_20150206-133705-410_L1C_667-317-0_D",
@@ -42,6 +42,8 @@
   "properties": {
     "datetime": "2015-02-06T13:37:05Z",
     "geodes:visibility": "public",
+    "geodes:provider_id": "S2A_MSIL1C_20150206T133705_N0204_R125_T31TCJ_20150206T133705",
+    "geodes:provider_dissemination_datetime": "2015-02-07T08:00:00Z",
     "statistics": {
       "water": 0,
       "nodata_pixel": 0,
