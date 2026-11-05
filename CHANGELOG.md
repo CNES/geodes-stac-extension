@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.0]
+
+### Added
+
+- Optional `geodes:provider_id` (when provider id is overridden) and
+  `geodes:provider_dissemination_datetime` for traceability and provider publication datetime.
+
 ## [v0.4.0]
 
 First version in this repository, moved from the GEODES data model repository (`schemas/extensions/geodes/`).
@@ -42,7 +49,9 @@ Published at `https://geodes.cnes.fr/stac/extensions/geodes/v0.2.0/schema.json`.
 
 - `geodes:visibility` (`public`, `private`, `expert`).
 
-[Unreleased]: <https://github.com/CNES/geodes-stac-extension/compare/v0.4.0...HEAD>
+[Unreleased]: <https://github.com/CNES/geodes-stac-extension/compare/v0.5.0...HEAD>
+
+[v0.5.0]: <https://github.com/CNES/geodes-stac-extension/compare/v0.4.0...v0.5.0>
 
 [v0.4.0]: <https://github.com/CNES/geodes-stac-extension/tree/v0.4.0>
 

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json#",
+  "$id": "https://cnes.github.io/geodes-stac-extension/v0.5.0/schema.json#",
   "title": "GEODES Extension",
   "description": "STAC GEODES Extension for STAC Items and STAC Collections: fields of the CNES GEODES catalog that no other STAC extension covers, and the GEODES keys of the common metadata Statistics Object.",
   "type": "object",
@@ -12,7 +12,7 @@
     "stac_extensions": {
       "type": "array",
       "contains": {
-        "const": "https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json"
+        "const": "https://cnes.github.io/geodes-stac-extension/v0.5.0/schema.json"
       }
     },
     "type": {
@@ -80,12 +80,32 @@
       ],
       "description": "Item-level access tier asserted by the data provider. Consumed by GEODES access policies (schemas/policies/v1/) to gate read and download. 'public' items are accessible to anyone; 'private' items require an authenticated user with the right Keycloak group (typically the collection's group, e.g. 'co3d'); 'expert' items are reserved for expert-tier audiences (e.g. FLATSIM_*_VD_EXPERT). Providers are responsible for setting this field correctly at ingestion."
     },
+    "geodes:provider_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "External catalog identifier assigned by the originating provider (e.g., CDSE product ID). Used for traceability."
+    },
+    "geodes:provider_dissemination_datetime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Datetime at which the provider published the product, in RFC 3339 format. Distinct from processing:datetime."
+    },
     "require_any_field": {
-      "$comment": "An Item that declares this extension carries geodes:visibility or statistics.",
+      "$comment": "An Item that declares this extension carries at least one GEODES field or statistics.",
       "anyOf": [
         {
           "required": [
             "geodes:visibility"
+          ]
+        },
+        {
+          "required": [
+            "geodes:provider_id"
+          ]
+        },
+        {
+          "required": [
+            "geodes:provider_dissemination_datetime"
           ]
         },
         {
@@ -100,6 +120,12 @@
       "properties": {
         "geodes:visibility": {
           "$ref": "#/definitions/geodes:visibility"
+        },
+        "geodes:provider_id": {
+          "$ref": "#/definitions/geodes:provider_id"
+        },
+        "geodes:provider_dissemination_datetime": {
+          "$ref": "#/definitions/geodes:provider_dissemination_datetime"
         }
       },
       "patternProperties": {

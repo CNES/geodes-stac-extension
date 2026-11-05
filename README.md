@@ -1,7 +1,7 @@
 # GEODES Extension Specification
 
 - **Title:** GEODES
-- **Identifier:** <https://cnes.github.io/geodes-stac-extension/v0.4.0/schema.json>
+- **Identifier:** <https://cnes.github.io/geodes-stac-extension/v0.5.0/schema.json>
 - **Field Name Prefix:** geodes
 - **Scope:** Item, Collection
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
@@ -31,11 +31,14 @@ The fields in the table below can be used in these parts of STAC documents:
 - [ ] Links
 - [ ] Bands
 
-| Field Name        | Type   | Description                                               |
-| ----------------- | ------ | --------------------------------------------------------- |
-| geodes:visibility | string | Access tier of the item: `public`, `private` or `expert`. |
+| Field Name                             | Type      | Description                                                                         |
+| -------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
+| geodes:visibility                      | string    | Access tier of the item: `public`, `private` or `expert`.                           |
+| geodes:provider_id                     | string    | Identifier assigned by the originating provider (e.g., CDSE product ID).  |
+| geodes:provider_dissemination_datetime | date-time | Datetime at which the provider published the product.                     |
 
-An Item that declares this extension must have `geodes:visibility` or `statistics`.
+An Item that declares this extension must have at least one of `geodes:visibility`, `geodes:provider_id`,
+`geodes:provider_dissemination_datetime` or `statistics`.
 
 ### Additional Field Information
 
@@ -48,6 +51,16 @@ The data provider sets the access tier of each item. The GEODES access policies 
 - `expert`: only the expert audience of the collection can access the item.
 
 Example: `"geodes:visibility": "public"`.
+
+#### geodes:provider_id
+
+External catalog identifier assigned by the originating provider (for example a CDSE product ID), for traceability.
+It replaces the REGARDS `provider_urn`.
+
+#### geodes:provider_dissemination_datetime
+
+Datetime at which the provider published the product (RFC 3339). It is distinct from `processing:datetime`.
+It replaces the REGARDS `provider_dissemination_datetime`.
 
 ## Statistics keys
 
