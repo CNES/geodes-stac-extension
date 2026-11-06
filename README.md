@@ -1,7 +1,7 @@
 # GEODES Extension Specification
 
 - **Title:** GEODES
-- **Identifier:** <https://cnes.github.io/geodes-stac-extension/v0.5.0/schema.json>
+- **Identifier:** <https://cnes.github.io/geodes-stac-extension/v0.5.1/schema.json>
 - **Field Name Prefix:** geodes
 - **Scope:** Item, Collection
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
@@ -77,7 +77,7 @@ Statistics Object stay allowed.
 
 | Key                         | Type    | Description                                                                                    |
 | --------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
-| water                       | number  | Percentage of water pixels.                                                                    |
+| water_cover                 | number  | Percentage of water pixels.                                                                    |
 | nodata\_pixel               | number  | Percentage of no-data pixels (= 100 − `valid_percent`).                                        |
 | saturated\_defective\_pixel | number  | Percentage of saturated or defective pixels.                                                   |
 | ground\_useful\_pixel       | number  | Percentage of useful ground pixels (not cloud, not no-data).                                   |
@@ -91,7 +91,7 @@ Example:
 
 ```json
 "statistics": {
-  "water": 0.0,
+  "water_cover": 0.0,
   "nodata_pixel": 0.0,
   "saturated_defective_pixel": 6.807989,
   "ground_useful_pixel": 75.490373,

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.1]
+
+### Changed
+
+- Renamed the Statistics Object key `water` to `water_cover`.
+
 ## [v0.5.0]
 
 ### Added
